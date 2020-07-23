@@ -132,7 +132,7 @@ class SAsimulate:
               print("Avarage classification Error: ", avr_error)
               self.writer.add_scalar("Average Error", avr_error, count)
               self.writer.close()
-#chahcaoshoichas
+
 # Inject error without doing anything to the weight
 def method0(model, total_param, error_total):
     device = torch.device("cuda")
@@ -170,7 +170,6 @@ def ECC(error_tensor, original_tensor):
             error_flatten[index + error_index] = original_flatten[index + error_index]
     correct_tensor = error_flatten.view(shape)
     return correct_tensor
-
 
 # import cProfile
 # total_param = 11173962
