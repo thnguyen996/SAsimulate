@@ -256,27 +256,30 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
     weights_flat = weights.view(-1)
     device = torch.device("cuda")
-    if weights_flat.numel() > 16:
+    if weights_flat.numel() > 16 and mapped_float.numel() > 16:
         weight_binary = mapped_binary
     else:
         return weights
     # Creating masks for all weights in one layer
     # conv_binary = float2bit(weights, num_e_bits=8, num_m_bits=23, bias=127.)
     mask0_binary, mask1_binary = SAsimulate3.create_mask(shape, error_rate=error_rate)
-    # mask0_binary, mask1_binary = mask0_binary.to(torch.device("cuda")), mask1_binary.to(torch.device("cuda"))
-    # mask0_binary, mask1_binary = mask0_binary.repeat(16, 1).view(16, int(weights_flat.shape[0]/16), 16, 32),\
-    #         mask1_binary.repeat(16, 1).view(16, int(weights_flat.shape[0]/16), 16, 32)
-    # mask0_binary, mask1_binary = mask0_binary.transpose_(1, 0), mask1_binary.transpose_(1, 0)
     # reporter = MemReporter()
     # reporter.report()
     mask0_binary, mask1_binary = (
         mask0_binary.view(int(mask0_binary.numel() / 32 / 16), 16, 32),
         mask1_binary.view(int(mask1_binary.numel() / 32 / 16), 16, 32),
     )
+    flip_mapped = ~(mapped_binary > 0.)
+    flip_mapped = flip_mapped.float()
+    mapped_binary = torch.cat((mapped_binary, flip_mapped), dim=1)
+
+    del flip_mapped
+    torch.cuda.empty_cache()
+
     new_weight_binary = torch.empty([*mapped_binary.shape], device = device)
-    for i in range(16):
-        new_weight_binary[:, :, i, :] = SAsimulate3.make_SA(
-            mapped_binary[:, :, i, :], mask0_binary, mask1_binary
+    for i in range(32):
+        new_weight_binary[:, i, :, :] = SAsimulate3.make_SA(
+            mapped_binary[:, i, :, :], mask0_binary, mask1_binary
         )
     del mask0_binary
     del mask1_binary
@@ -286,6 +289,9 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     # new_weight = bit2float(
     #     new_weight_binary, num_e_bits=8, num_m_bits=23, bias=127.0
     # )
+    reflip_mapped = ~(new_weight_binary[:, 16:32, ...] > 0.)
+    reflip_mapped = reflip_mapped.float()
+    new_weight_binary[:, 16:32, ...] = reflip_mapped
     new_weight = new_map_gen(new_weight_binary)
 
     # mapped_binary = mapped_binary.to(device)
@@ -294,22 +300,23 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
 
     index = torch.arange(16).to("cuda")
     index_map = wmp.mapallweights(index)
+    # add weight_cases for flip mapped
+    mapped_float = torch.cat((mapped_float, mapped_float), dim=1)
+
     for weight_cases, new_weight_16 in zip(mapped_float[:, ...], new_weight):
         if weight_cases.numel() < 16:
             break
         else:
             origin_weight = weights_flat[weight_index : weight_index + 16]
-            # dev = torch.empty(16, 16)
             dev = abs(weight_cases - new_weight_16)
-            # for i in range(16):
-            #     # weight remap
-            #     weight_remap = torch.index_select(
-            #         new_weight_16[i, ...], 0, index_map[0]["w" + str(i)]
-            #     )
-                # dev[i, ...] = abs(origin_weight - weight_remap)
             dev_sum = torch.sum(dev, dim=0)
             min_dev, best_map = torch.min(dev_sum, dim=0)
-            _, indicies = torch.sort(index_map[0]["w" + str(best_map.item())])
+
+            if best_map <= 16:
+                _, indicies = torch.sort(index_map[0]["w" + str(best_map.item())])
+            else:
+                _, indicies = torch.sort(index_map[0]["w" + str(best_map.item() - 16)])
+
             weight_remap2 = torch.index_select(
                 new_weight_16[best_map.item(), ...],
                 0,
