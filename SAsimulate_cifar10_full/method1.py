@@ -135,30 +135,6 @@ def main():
     error_range = np.linspace(1e-10, 1e-05, 10)
     simulate.run(error_range)
 
-    # count = 0
-    # avr_error = 0.
-    # for error_total in error_range:
-    #     running_error = []
-    #     count += 1
-    #     print("Error rate: ", error_total)
-    #     for i in range(10):
-    #         model = method1(model, mapped_gen, error_total)
-    #         acc1 = test(print_freq=10, model=model, device=device, test_loader=test_loader)
-
-    #         running_error.append(100. - acc1.item())
-    #     avr_error = sum(running_error)/len(running_error)
-    #     print("Avarage classification Error: ", avr_error)
-    #     writer.add_scalar("Average Error", avr_error, count)
-    #     writer.close()
-
-    # for error_total in np.linspace(1e-10, 1e-05, 100):
-    #     print("Error rate: ", error_total)
-    #     weight_generator = weight_gen(mapped_gen)
-    #     model2 = method1(model.to(device), weight_generator, error_total=error_total)
-    #     acc1 = test(print_freq=10, model=model2, device=device, test_loader=test_loader)
-    #     print(acc1)
-
-
 class SAsimulate:
     def __init__(self, test_loader, model, state_dict, method, mapped_float, writer):
         self.test_loader = test_loader
