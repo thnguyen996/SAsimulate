@@ -1,4 +1,5 @@
 SAsimulate_ECC/data/cifar-10-python.tar.gz
 SAsimulate_cifar10_full/data/cifar-10-python.tar.gz
 SAsimulate_cifar10_full/save_weights/*
+SAsimulate_cifar10_full/runs/*
 *.pt
