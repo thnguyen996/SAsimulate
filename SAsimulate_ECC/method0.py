@@ -136,12 +136,12 @@ class SAsimulate:
 # Inject error without doing anything to the weight
 def method0(model, total_param, error_total):
     device = torch.device("cuda")
-    pdb.set_trace()
     with torch.no_grad():
       for name, param in model.named_parameters():
         shape = param.data.shape
         error_layer = (param.numel()/total_param)*error_total
         param_binary = float2bit(param.data, num_e_bits=8, num_m_bits=23, bias=127.)
+        pdb.set_trace()
         mask, mask1 = SAsimulate2.create_mask(param_binary, error_layer)
         # mask, mask1 = mask.to(device), mask1.to(device)
         output = SAsimulate2.make_SA2(param.data.view(-1), mask, mask1)
@@ -184,6 +184,7 @@ def ECC(error_tensor, original_tensor):
 
 # profiler.stop()
 # print(profiler.output_text(unicode=True, color=True))
+# testing git 
 
 if __name__ == '__main__':
     main()
