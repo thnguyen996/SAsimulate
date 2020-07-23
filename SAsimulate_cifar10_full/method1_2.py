@@ -39,6 +39,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 now = datetime.now().date()
 ran = random.randint(1, 231242)
 
+
 def test(net, testloader, device, criterion):
     net.eval()
     test_loss = 0
@@ -67,6 +68,7 @@ def test(net, testloader, device, criterion):
     # Save best accuracy.
     acc = 100.0 * correct / total
     return acc
+
 
 def main():
 
@@ -114,7 +116,9 @@ def main():
 
     device = torch.device("cuda")
 
-    writer = SummaryWriter("runs/{}-{}".format(now, "cifar10-method1 (100 points) 1e-10 --> 1e-05 (10)"))
+    writer = SummaryWriter(
+        "runs/{}-{}".format(now, "cifar10-method2 (100 points) 1e-10 --> 1e-05 (10)")
+    )
 
     # Create model
     model = ResNet18().to(device)
@@ -206,6 +210,7 @@ class SAsimulate:
                 self.writer.add_scalar("Average Error", avr_error, count)
                 self.writer.close()
 
+
 # Inject error without doing anything to the weight
 def method0(model, error_total):
     total_param = 0
@@ -235,7 +240,7 @@ def method1(model, float_gen, error_total):
             # print("Loading: " + str(name))
             # if name == "layer4.0.conv1.weight":
             mapped_binary_dict = torch.load(
-                "./save_weights/"+ str(name) + "_binary.pt",
+                "./save_weights/" + str(name) + "_binary.pt",
                 map_location=torch.device("cuda"),
             )
             mapped_binary_val = mapped_binary_dict[name]
@@ -251,7 +256,6 @@ def method1(model, float_gen, error_total):
 ## Output: new weight with less error
 
 # @profile_every(1)
-#editingggggggg
 def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
     weights_flat = weights.view(-1)
@@ -269,14 +273,14 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
         mask0_binary.view(int(mask0_binary.numel() / 32 / 16), 16, 32),
         mask1_binary.view(int(mask1_binary.numel() / 32 / 16), 16, 32),
     )
-    flip_mapped = ~(mapped_binary > 0.)
+    flip_mapped = ~(mapped_binary > 0.0)
     flip_mapped = flip_mapped.float()
     mapped_binary = torch.cat((mapped_binary, flip_mapped), dim=1)
 
     del flip_mapped
     torch.cuda.empty_cache()
 
-    new_weight_binary = torch.empty([*mapped_binary.shape], device = device)
+    new_weight_binary = torch.empty([*mapped_binary.shape], device=device)
     for i in range(32):
         new_weight_binary[:, i, :, :] = SAsimulate3.make_SA(
             mapped_binary[:, i, :, :], mask0_binary, mask1_binary
@@ -289,7 +293,7 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     # new_weight = bit2float(
     #     new_weight_binary, num_e_bits=8, num_m_bits=23, bias=127.0
     # )
-    reflip_mapped = ~(new_weight_binary[:, 16:32, ...] > 0.)
+    reflip_mapped = ~(new_weight_binary[:, 16:32, ...] > 0.0)
     reflip_mapped = reflip_mapped.float()
     new_weight_binary[:, 16:32, ...] = reflip_mapped
     new_weight = new_map_gen(new_weight_binary)
@@ -318,9 +322,7 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
                 _, indicies = torch.sort(index_map[0]["w" + str(best_map.item() - 16)])
 
             weight_remap2 = torch.index_select(
-                new_weight_16[best_map.item(), ...],
-                0,
-                indicies,
+                new_weight_16[best_map.item(), ...], 0, indicies,
             )
             weights_flat[weight_index : weight_index + 16] = weight_remap2
             binary_index = binary_index + 512
@@ -332,9 +334,11 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     torch.cuda.empty_cache()
     return new_weights
 
+
 def new_map_gen(binary_map):
     for i in range(binary_map.shape[0]):
         yield bit2float(binary_map[i, ...], 8, 23, 127.0)
+
 
 ######## Load mapped weights from file and return a generator of weights for each layer
 
