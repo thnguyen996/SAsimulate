@@ -251,7 +251,7 @@ def method1(model, float_gen, error_total):
 ## Output: new weight with less error
 
 # @profile_every(1)
-
+#editingggggggg
 def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
     weights_flat = weights.view(-1)
