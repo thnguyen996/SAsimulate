@@ -231,7 +231,7 @@ def method1(model, float_gen, error_total):
 ## Input: weights in 1 layer, error rate of layer
 ## Output: new weight with less error
 
-@profile_every(1)
+# @profile_every(1)
 def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
     weights_flat = weights.view(-1)
