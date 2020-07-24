@@ -231,7 +231,7 @@ def method1(model, float_gen, error_total):
 ## Input: weights in 1 layer, error rate of layer
 ## Output: new weight with less error
 
-# @profile_every(1)
+@profile_every(1)
 def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
     weights_flat = weights.view(-1)
@@ -251,19 +251,24 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     )
     flip_mapped = ~(mapped_binary > 0.0)
     flip_mapped = flip_mapped.float()
-    mapped_binary = torch.cat((mapped_binary, flip_mapped), dim=1)
-
-    del flip_mapped
-    torch.cuda.empty_cache()
+    # mapped_binary = torch.cat((mapped_binary, flip_mapped), dim=1)
 
     new_weight_binary = torch.empty([*mapped_binary.shape], device=device)
-    for i in range(32):
+    new_weight_binary = torch.cat((new_weight_binary, new_weight_binary), dim=1)
+    pdb.set_trace()
+#TODO: Reduce memory overhead
+    for i in range(16):
         new_weight_binary[:, i, :, :] = SAsimulate3.make_SA(
             mapped_binary[:, i, :, :], mask0_binary, mask1_binary
+        )
+    for i in range(16):
+        new_weight_binary[:, i+16, :, :] = SAsimulate3.make_SA(
+            flip_mapped[:, i, :, :], mask0_binary, mask1_binary
         )
     del mask0_binary
     del mask1_binary
     del mapped_binary
+    del flip_mapped
     torch.cuda.empty_cache()
 
     # new_weight = bit2float(
@@ -278,7 +283,7 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     binary_index = 0
     weight_index = 0
 
-    index = torch.arange(16).to("cuda")
+    index = torch.arange(16).to(device)
     index_map = wmp.mapallweights(index)
     # add weight_cases for flip mapped
     mapped_float = torch.cat((mapped_float, mapped_float), dim=1)
@@ -309,7 +314,6 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     del weights
     torch.cuda.empty_cache()
     return new_weights
-
 
 def new_map_gen(binary_map):
     for i in range(binary_map.shape[0]):
@@ -377,7 +381,6 @@ class ProgressMeter(object):
         fmt = "{:" + str(num_digits) + "d}"
         return "[" + fmt + "/" + fmt.format(num_batches) + "]"
 
-
 def adjust_learning_rate(optimizer, epoch, args):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
     lr = args.lr * (0.1 ** (epoch // 30))
@@ -398,7 +401,6 @@ def accuracy(output, target, topk=(1,)):
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
-
 
 # import cProfile
 # device = torch.device("cuda")
