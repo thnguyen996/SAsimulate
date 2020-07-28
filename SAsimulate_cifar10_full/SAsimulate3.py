@@ -78,14 +78,14 @@ def calculate_stuck(conv_binary, mask, mask1):
 #    return stuck_total
 
 ## Create 2 mask: Stuck at 0 and stuck at 1
-def create_mask(weight_shape, error_rate):
+def create_mask(weight_shape, error_rate, device):
     shape_list = [*weight_shape, 32]
     mask = torch.zeros(shape_list)
     mask1 = torch.zeros(shape_list)
     num_SA = (error_rate * np.prod(shape_list))/2.
-    index = torch.randperm(mask.numel(), device = torch.device("cuda"))
-    mask = mask.view(-1).to("cuda")                 # mask flatten
-    mask1= mask1.view(-1).to("cuda")
+    index = torch.randperm(mask.numel(), device = device)
+    mask = mask.view(-1).to(device)                 # mask flatten
+    mask1= mask1.view(-1).to(device)
     num_SA0 = index[:int(num_SA)]
     num_SA1 = index[(index.numel()-int(num_SA)):]
     mask[num_SA0] = 1.

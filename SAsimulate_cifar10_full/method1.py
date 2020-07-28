@@ -33,7 +33,7 @@ from utils import progress_bar
 
 # Specify gpu
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 
 # Tensorboard run id
 now = datetime.now().date()
@@ -73,7 +73,7 @@ def test(net, testloader, device, criterion):
 def main():
 
     print("Loading mapped float weights:")
-    mapped_float = load_mapped_weights()
+    mapped_float = load_mapped_weights(device="cpu")
     # mapped_binary = load_mapped_binary()
     print("Weights loaded")
 
@@ -186,7 +186,6 @@ class SAsimulate:
                 self.writer.add_scalar("Average Error", avr_error, count)
                 self.writer.close()
 
-
 # Inject error without doing anything to the weight
 def method0(model, error_total):
     total_param = 0
@@ -217,13 +216,22 @@ def method1(model, float_gen, error_total):
             # if name == "layer4.0.conv1.weight":
             mapped_binary_dict = torch.load(
                 "./save_weights/" + str(name) + "_binary.pt",
-                map_location=torch.device("cuda"),
+                map_location=torch.device("cpu"),
             )
             mapped_binary_val = mapped_binary_dict[name]
             output = weight_map2(
-                param.data, mapped_float[1], mapped_binary_val, error_layer
+                param.data, mapped_float[1], mapped_binary_val, error_layer, parallel=False
             )
+            # if mapped_binary_val.shape[0] > 50000:
+            #     output = weight_map2(
+            #         param.data, mapped_float[1], mapped_binary_val, error_layer, parallel=True
+            #     )
+            # else:
+            #     output = weight_map2(
+            #         param.data, mapped_float[1], mapped_binary_val, error_layer, parallel=False
+            #     )
             param.data = output
+    pdb.set_trace()
     return model
 
 
@@ -232,22 +240,22 @@ def method1(model, float_gen, error_total):
 ## Output: new weight with less error
 
 # @profile_every(1)
-def weight_map2(weights, mapped_float, mapped_binary, error_rate):
+def weight_map2(weights, mapped_float, mapped_binary, error_rate, parallel):
     shape = weights.shape
-    weights_flat = weights.view(-1)
-    device = torch.device("cuda")
+    device = torch.device("cpu")
+    weights_flat = weights.view(-1).to(device)
     if weights_flat.numel() > 16 and mapped_float.numel() > 16:
         weight_binary = mapped_binary
     else:
         return weights
     # Creating masks for all weights in one layer
     # conv_binary = float2bit(weights, num_e_bits=8, num_m_bits=23, bias=127.)
-    mask0_binary, mask1_binary = SAsimulate3.create_mask(shape, error_rate=error_rate)
+    mask0_binary, mask1_binary = SAsimulate3.create_mask(shape, error_rate=error_rate, device=device)
     # reporter = MemReporter()
     # reporter.report()
     mask0_binary, mask1_binary = (
-        mask0_binary.view(int(mask0_binary.numel() / 32 / 16), 16, 32),
-        mask1_binary.view(int(mask1_binary.numel() / 32 / 16), 16, 32),
+        mask0_binary.repeat(32, 1).view(int(mask0_binary.numel() / 32 / 16), 32, 16, 32),
+        mask1_binary.repeat(32, 1).view(int(mask1_binary.numel() / 32 / 16), 32, 16, 32),
     )
     flip_mapped = ~(mapped_binary > 0.0)
     flip_mapped = flip_mapped.float()
@@ -255,35 +263,28 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
 
     del flip_mapped
     torch.cuda.empty_cache()
-
     new_weight_binary = torch.empty([*mapped_binary.shape], device=device)
-    for i in range(32):
-        new_weight_binary[:, i, :, :] = SAsimulate3.make_SA(
-            mapped_binary[:, i, :, :], mask0_binary, mask1_binary
-        )
-    del mask0_binary
-    del mask1_binary
-    del mapped_binary
-    torch.cuda.empty_cache()
-
-    # new_weight = bit2float(
-    #     new_weight_binary, num_e_bits=8, num_m_bits=23, bias=127.0
-    # )
+    new_weight_binary = SAsimulate3.make_SA(
+                mapped_binary, mask0_binary, mask1_binary
+                )
     reflip_mapped = ~(new_weight_binary[:, 16:32, ...] > 0.0)
     reflip_mapped = reflip_mapped.float()
     new_weight_binary[:, 16:32, ...] = reflip_mapped
-    new_weight = new_map_gen(new_weight_binary)
+
+    new_weight = bit2float(
+        new_weight_binary, num_e_bits=8, num_m_bits=23, bias=127.0, device=device
+    )
 
     # mapped_binary = mapped_binary.to(device)
     binary_index = 0
     weight_index = 0
 
-    index = torch.arange(16).to("cuda")
+    index = torch.arange(16)
     index_map = wmp.mapallweights(index)
     # add weight_cases for flip mapped
     mapped_float = torch.cat((mapped_float, mapped_float), dim=1)
 
-    for weight_cases, new_weight_16 in zip(mapped_float[:, ...], new_weight):
+    for weight_cases, new_weight_16 in zip(mapped_float[:, ...], new_weight[:, ...]):
         if weight_cases.numel() < 16:
             break
         else:
@@ -307,13 +308,12 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     del new_weight
     del new_weight_binary
     del weights
-    torch.cuda.empty_cache()
     return new_weights
 
 
-def new_map_gen(binary_map):
+def new_map_gen(binary_map, device):
     for i in range(binary_map.shape[0]):
-        yield bit2float(binary_map[i, ...], 8, 23, 127.0)
+        yield bit2float(binary_map[i, ...], 8, 23, 127.0, device)
 
 
 ######## Load mapped weights from file and return a generator of weights for each layer

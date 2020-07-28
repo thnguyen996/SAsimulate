@@ -32,7 +32,7 @@ import torch
 import warnings
 
 
-def bit2float(b, num_e_bits=8, num_m_bits=23, bias=127.):
+def bit2float(b, num_e_bits=8, num_m_bits=23, bias=127., device="cuda"):
   """Turn input tensor into float.
 
       Args:
@@ -57,22 +57,22 @@ def bit2float(b, num_e_bits=8, num_m_bits=23, bias=127.):
     warnings.warn("pytorch can not process floats larger than 64 bits, keep"
                   " this in mind. Your result will be not exact.")
 
-  s = torch.index_select(b, -1, torch.arange(0, 1).to(torch.device("cuda")))
-  e = torch.index_select(b, -1, torch.arange(1, 1 + num_e_bits).to(torch.device("cuda")))
+  s = torch.index_select(b, -1, torch.arange(0, 1).to(device))
+  e = torch.index_select(b, -1, torch.arange(1, 1 + num_e_bits).to(device))
   m = torch.index_select(b, -1, torch.arange(1 + num_e_bits,
-                                             1 + num_e_bits + num_m_bits).to(torch.device("cuda")))
+                                             1 + num_e_bits + num_m_bits).to(device))
   # SIGN BIT
   out = ((-1) ** s).squeeze(-1).type(dtype)
   # EXPONENT BIT
   exponents = -torch.arange(-(num_e_bits - 1.), 1.)
   exponents = exponents.repeat(b.shape[:-1] + (1,))
-  e_decimal = torch.sum(e * 2 ** exponents.to(torch.device("cuda")), dim=-1) - bias
+  e_decimal = torch.sum(e * 2 ** exponents.to(device), dim=-1) - bias
   out *= 2 ** e_decimal
   # MANTISSA
   matissa = (torch.Tensor([2.]) ** (
     -torch.arange(1., num_m_bits + 1.))).repeat(
     m.shape[:-1] + (1,))
-  out *= 1. + torch.sum(m * matissa.to(torch.device("cuda")), dim=-1)
+  out *= 1. + torch.sum(m * matissa.to(device), dim=-1)
   return out
 
 
