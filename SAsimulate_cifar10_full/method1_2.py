@@ -33,7 +33,7 @@ from utils import progress_bar
 
 # Specify gpu
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 # Tensorboard run id
 now = datetime.now().date()
@@ -114,7 +114,7 @@ def main():
 
     device = torch.device("cuda")
 
-    writer = SummaryWriter("runs/{}-{}".format(now, "cifar10-method1 (100 points) 1e-10 --> 1e-05 (10)"))
+    writer = SummaryWriter("runs/{}-{}".format(now, "cifar10-method1 (100 points) 1e-10 --> 1e-03 (10)"))
 
     # Create model
     model = ResNet18().to(device)
@@ -128,7 +128,7 @@ def main():
         mapped_float=mapped_float,
         writer=writer,
     )
-    error_range = np.linspace(1e-10, 1e-05, 10)
+    error_range = np.linspace(1e-10, 1e-03, 10)
     simulate.run(error_range)
 
     # count = 0
