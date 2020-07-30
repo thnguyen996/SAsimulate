@@ -26,11 +26,11 @@ save_binary = collections.OrderedDict({})
 
 # Save mapped float weights
 
-# for layer in tqdm(state_dict):
-#     weights = state_dict[layer].view(-1)
-#     map_cases = wmp.mapallweights2(weights)
-#     save_weights.update({layer: map_cases})
-# torch.save(save_weights, "saved_weights.pt")
+for layer in tqdm(state_dict):
+    weights = state_dict[layer].view(-1)
+    map_cases = wmp.mapallweights2(weights)
+    save_weights.update({layer: map_cases})
+torch.save(save_weights, "saved_weights.pt")
 
 # for i, layer in enumerate(state_dict):
 #     weights = state_dict[layer].view(-1)
@@ -39,19 +39,19 @@ save_binary = collections.OrderedDict({})
 #     print("Layer", i, "is saved")
 
 # ################# Save mapped binary weights:
-for layer in state_dict:
-    save_binary = collections.OrderedDict({})
-    weights = state_dict[layer].view(-1)
-    map_cases = wmp.mapallweights2(weights)
-    if (weights.numel() >= 16):
-        map_binary = float2bit(map_cases, num_e_bits=8, num_m_bits=23, bias=127.0)
-        save_binary.update({layer: map_binary})
-        torch.save(save_binary, "./save_weights/"+ str(layer) + "_binary.pt")
-    else:
-        map_binary = weights
-        save_binary.update({layer: map_binary})
-        torch.save(save_binary, "./save_weights/"+ str(layer) + "_binary.pt")
-        print("Numbers of weights smaller than 16")
+# for layer in state_dict:
+#     save_binary = collections.OrderedDict({})
+#     weights = state_dict[layer].view(-1)
+#     map_cases = wmp.mapallweights2(weights)
+#     if (weights.numel() >= 16):
+#         map_binary = float2bit(map_cases, num_e_bits=8, num_m_bits=23, bias=127.0)
+#         save_binary.update({layer: map_binary})
+#         torch.save(save_binary, "./save_weights/"+ str(layer) + "_binary.pt")
+#     else:
+#         map_binary = weights
+#         save_binary.update({layer: map_binary})
+#         torch.save(save_binary, "./save_weights/"+ str(layer) + "_binary.pt")
+#         print("Numbers of weights smaller than 16")
 
 # def weight_gen(mapped_weights):
 #     for layer in mapped_weights:

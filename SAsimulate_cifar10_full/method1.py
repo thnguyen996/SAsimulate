@@ -69,7 +69,6 @@ def test(net, testloader, device, criterion):
     acc = 100.0 * correct / total
     return acc
 
-
 def main():
 
     print("Loading mapped float weights:")
@@ -175,8 +174,7 @@ class SAsimulate:
                 count += 1
                 print("Error rate: ", error_total)
                 for i in range(100):
-                    float_gen = weight_gen(self.mapped_float)
-                    model = method1(orig_model, float_gen, error_total)
+                    model = method1(orig_model, self.mapped_float, error_total)
                     acc1 = test(model, self.test_loader, self.device, self.criterion)
                     running_error.append(100.0 - acc1)
                     orig_model.load_state_dict(self.state_dict)
@@ -207,25 +205,40 @@ def method0(model, error_total):
 
 
 # XOR address mapping weight to reduce stuck at fault bits
-def method1(model, float_gen, error_total):
+def method1(model, mapped_float, error_total):
     total_param = 1173962
     with torch.no_grad():
-        for (name, param), mapped_float in zip(model.named_parameters(), float_gen):
+        for (name, param) in model.named_parameters():
             # TODO: Skip running mean and var and num_batches_tracked layer
             error_layer = (param.numel() / total_param) * error_total
             # print("Loading: " + str(name))
-            # if name == "layer4.0.conv1.weight":
             mapped_binary_dict = torch.load(
                 "./save_weights/" + str(name) + "_binary.pt",
                 map_location=torch.device("cuda"),
             )
+            print(name)
             mapped_binary_val = mapped_binary_dict[name]
-            output = weight_map2(
-                param.data, mapped_float[1], mapped_binary_val, error_layer
-            )
+            if mapped_binary_val.numel() < 600000000:
+                output = weight_map2(
+                    param.data, mapped_float[name], mapped_binary_val, error_layer
+                )
+            else:
+                pdb.set_trace()
+                split_shape = int(mapped_binary_val.shape[0]/2)
+                mapped_float_split = mapped_float[name].view(split_shape, 16, 16)
+#TODO: split weight data
+                weight_split = param.view(int)
+                mapped_binary_split = mapped_binary_val.view(split_shape, 2, 16, 16, 32)
+                output = weight_map2(
+                        param.data, mapped_float[name], mapped_binary_split[:, 0, ...], error_layer
+                )
+                for i in range(1, 2):
+                    output_i = weight_map2(
+                            param.data, mapped_float[name], mapped_binary_split[:, i, ...], error_layer
+                    )
+                    output = torch.cat((output, output_i), dim=0)
             param.data = output
     return model
-
 
 ## Create mask --> Find minimum mapping --> Inject error --> Remap
 ## Input: weights in 1 layer, error rate of layer
@@ -255,7 +268,6 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
 
     new_weight_binary = torch.empty([*mapped_binary.shape], device=device)
     new_weight_binary = torch.cat((new_weight_binary, new_weight_binary), dim=1)
-    pdb.set_trace()
 #TODO: Reduce memory overhead
     for i in range(16):
         new_weight_binary[:, i, :, :] = SAsimulate3.make_SA(
