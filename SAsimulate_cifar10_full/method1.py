@@ -1,7 +1,10 @@
+import os
+# Specify gpu
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 import argparse
 import collections
 import cProfile
-import os
 import pdb
 import random
 import shutil
@@ -31,9 +34,6 @@ from pyinstrument import Profiler
 from pytorch_memlab import MemReporter, profile_every
 from utils import progress_bar
 
-# Specify gpu
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Tensorboard run id
 now = datetime.now().date()
@@ -223,18 +223,18 @@ def method1(model, mapped_float, error_total):
                     param.data, mapped_float[name], mapped_binary_val, error_layer
                 )
             else:
+                split_shape = int(mapped_binary_val.shape[0]/4)
                 pdb.set_trace()
-                split_shape = int(mapped_binary_val.shape[0]/2)
-                mapped_float_split = mapped_float[name].view(split_shape, 16, 16)
+                mapped_float_split = mapped_float[name].view(split_shape, 4, 16, 16)
 #TODO: split weight data
-                weight_split = param.view(int)
-                mapped_binary_split = mapped_binary_val.view(split_shape, 2, 16, 16, 32)
+                weight_split = param.view(split_shape, 4, 16)
+                mapped_binary_split = mapped_binary_val.view(split_shape, 4, 16, 16, 32)
                 output = weight_map2(
-                        param.data, mapped_float[name], mapped_binary_split[:, 0, ...], error_layer
+                        weight_split[:, 0, :], mapped_float_split[:, 0, ...], mapped_binary_split[:, 0, ...], error_layer
                 )
-                for i in range(1, 2):
+                for i in range(1, 4):
                     output_i = weight_map2(
-                            param.data, mapped_float[name], mapped_binary_split[:, i, ...], error_layer
+                            weight_split[:, i, :], mapped_float_split[:, i, ...], mapped_binary_split[:, i, ...], error_layer
                     )
                     output = torch.cat((output, output_i), dim=0)
             param.data = output
@@ -247,7 +247,8 @@ def method1(model, mapped_float, error_total):
 # @profile_every(1)
 def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
-    weights_flat = weights.view(-1)
+    weights_flat = weights.reshape(1, -1)
+    weights_flat = weights_flat.squeeze()
     device = torch.device("cuda")
     if weights_flat.numel() > 16 and mapped_float.numel() > 16:
         weight_binary = mapped_binary
