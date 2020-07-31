@@ -33,7 +33,7 @@ from utils import progress_bar
 
 # Specify gpu
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Tensorboard run id
 now = datetime.now().date()
@@ -114,7 +114,7 @@ def main():
 
     device = torch.device("cuda")
 
-    writer = SummaryWriter("runs/{}-{}".format(now, "cifar10-method1 (100 points) 1e-10 --> 1e-03 (10)"))
+    writer = SummaryWriter("runs/{}-{}".format(now, "cifar10-method1 (100 points) 1e-10 --> 1e-05 (10) -- code fix"))
 
     # Create model
     model = ResNet18().to(device)
@@ -128,7 +128,7 @@ def main():
         mapped_float=mapped_float,
         writer=writer,
     )
-    error_range = np.linspace(1e-10, 1e-03, 10)
+    error_range = np.linspace(1e-10, 1e-05, 10)
     simulate.run(error_range)
 
     # count = 0
@@ -195,8 +195,7 @@ class SAsimulate:
                 count += 1
                 print("Error rate: ", error_total)
                 for i in range(100):
-                    float_gen = weight_gen(self.mapped_float)
-                    model = method1(orig_model, float_gen, error_total)
+                    model = method1(orig_model, self.mapped_float, error_total)
                     acc1 = test(model, self.test_loader, self.device, self.criterion)
                     running_error.append(100.0 - acc1)
                     orig_model.load_state_dict(self.state_dict)
@@ -226,10 +225,10 @@ def method0(model, error_total):
 
 
 # XOR address mapping weight to reduce stuck at fault bits
-def method1(model, float_gen, error_total):
+def method1(model, mapped_float, error_total):
     total_param = 1173962
     with torch.no_grad():
-        for (name, param), mapped_float in zip(model.named_parameters(), float_gen):
+        for name, param in model.named_parameters() :
             # TODO: Skip running mean and var and num_batches_tracked layer
             error_layer = (param.numel() / total_param) * error_total
             # print("Loading: " + str(name))
@@ -240,7 +239,7 @@ def method1(model, float_gen, error_total):
             )
             mapped_binary_val = mapped_binary_dict[name]
             output = weight_map2(
-                param.data, mapped_float[1], mapped_binary_val, error_layer
+                param.data, mapped_float[name], mapped_binary_val, error_layer
             )
             param.data = output
     return model
