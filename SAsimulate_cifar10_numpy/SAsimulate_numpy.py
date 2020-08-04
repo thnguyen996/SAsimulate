@@ -16,11 +16,11 @@ def create_mask(weight_max, weight_min, total_weight, bit_error_rate):
         low=weight_min, high=weight_max, size=num_error_weights 
     ).astype(np.float32)
     mask = mask.view(np.uint32)
-
     zeros_shape = total_weight - num_error_weights
     zeros = np.zeros(zeros_shape, dtype=np.uint32)
     mask = np.concatenate((mask, zeros))
     np.random.shuffle(mask)
+    pdb.set_trace()
     return mask0, mask1
 
 def make_SA(weights, mask0, mask1):
@@ -50,7 +50,6 @@ if __name__ == "__main__":
     # state_dict = torch.load("./checkpoint/resnet.pt")['net']
     # weight_max, weight_min, total = calculate_weight_range(state_dict)
     weights = torch.load("./whole_weights_cpu.pt")
-    print(weights.device)
     weight_max = torch.tensor([0.7436], device="cuda:0")
     weight_min = torch.tensor([-0.6743], device="cuda:0")
     total_weight = 11169152 
