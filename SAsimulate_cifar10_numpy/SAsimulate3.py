@@ -59,24 +59,6 @@ def make_SA(weights, mask, mask1):
     # float_tensor = bit2float(output, num_e_bits=8, num_m_bits=23, bias=127.)
     return output
 
-#Calculate total numbers of error bits,
-# input: Flatten binary weights and mask
-# Output: Number of stuck bits 
-def calculate_stuck(conv_binary, mask, mask1):
-    stuck0 = torch.sum(mask*conv_binary, dim=1)
-    stuck1 = torch.sum(mask1, dim=1) - torch.sum(mask1*conv_binary, dim=1)
-    stuck_total = stuck0 + stuck1
-    return stuck_total
-
-##Calculate total numbers of error bits,
-## input: Flatten binary weights and mask
-## Output: Number of stuck bits 
-#def calculate_stuck(conv_binary, mask, mask1):
-#    stuck0 = torch.sum(mask*conv_binary)
-#    stuck1 = torch.sum(mask1) - torch.sum(mask1*conv_binary)
-#    stuck_total = stuck0 + stuck1
-#    return stuck_total
-
 ## Create 2 mask: Stuck at 0 and stuck at 1
 def create_mask(weight_shape, error_rate):
     shape_list = [*weight_shape, 32]
