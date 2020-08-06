@@ -131,29 +131,6 @@ def main():
     error_range = np.linspace(1e-10, 1e-05, 10)
     simulate.run(error_range)
 
-    # count = 0
-    # avr_error = 0.
-    # for error_total in error_range:
-    #     running_error = []
-    #     count += 1
-    #     print("Error rate: ", error_total)
-    #     for i in range(10):
-    #         model = method1(model, mapped_gen, error_total)
-    #         acc1 = test(print_freq=10, model=model, device=device, test_loader=test_loader)
-
-    #         running_error.append(100. - acc1.item())
-    #     avr_error = sum(running_error)/len(running_error)
-    #     print("Avarage classification Error: ", avr_error)
-    #     writer.add_scalar("Average Error", avr_error, count)
-    #     writer.close()
-
-    # for error_total in np.linspace(1e-10, 1e-05, 100):
-    #     print("Error rate: ", error_total)
-    #     weight_generator = weight_gen(mapped_gen)
-    #     model2 = method1(model.to(device), weight_generator, error_total=error_total)
-    #     acc1 = test(print_freq=10, model=model2, device=device, test_loader=test_loader)
-    #     print(acc1)
-
 
 class SAsimulate:
     def __init__(self, test_loader, model, state_dict, method, mapped_float, writer):
@@ -223,25 +200,27 @@ def method0(model, error_total):
             param.data = output.view(shape)
     return model
 
-
 # XOR address mapping weight to reduce stuck at fault bits
 def method1(model, mapped_float, error_total):
     total_param = 1173962
     with torch.no_grad():
         for name, param in model.named_parameters() :
-            # TODO: Skip running mean and var and num_batches_tracked layer
-            error_layer = (param.numel() / total_param) * error_total
-            # print("Loading: " + str(name))
-            # if name == "layer4.0.conv1.weight":
-            mapped_binary_dict = torch.load(
-                "./save_weights/"+ str(name) + "_binary.pt",
-                map_location=torch.device("cuda"),
-            )
-            mapped_binary_val = mapped_binary_dict[name]
-            output = weight_map2(
-                param.data, mapped_float[name], mapped_binary_val, error_layer
-            )
-            param.data = output
+            if "bias" in name:
+                continue
+            else:
+                # TODO: Skip running mean and var and num_batches_tracked layer
+                error_layer = (param.numel() / total_param) * error_total
+                # print("Loading: " + str(name))
+                # if name == "layer4.0.conv1.weight":
+                mapped_binary_dict = torch.load(
+                    "./save_weights/"+ str(name) + "_binary.pt",
+                    map_location=torch.device("cuda"),
+                )
+                mapped_binary_val = mapped_binary_dict[name]
+                output = weight_map2(
+                    param.data, mapped_float[name], mapped_binary_val, error_layer
+                )
+                param.data = output
     return model
 
 
@@ -260,12 +239,7 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     else:
         return weights
     # Creating masks for all weights in one layer
-    # conv_binary = float2bit(weights, num_e_bits=8, num_m_bits=23, bias=127.)
     mask0_binary, mask1_binary = SAsimulate3.create_mask(shape, error_rate=error_rate)
-    # mask0_binary, mask1_binary = mask0_binary.to(torch.device("cuda")), mask1_binary.to(torch.device("cuda"))
-    # mask0_binary, mask1_binary = mask0_binary.repeat(16, 1).view(16, int(weights_flat.shape[0]/16), 16, 32),\
-    #         mask1_binary.repeat(16, 1).view(16, int(weights_flat.shape[0]/16), 16, 32)
-    # mask0_binary, mask1_binary = mask0_binary.transpose_(1, 0), mask1_binary.transpose_(1, 0)
     # reporter = MemReporter()
     # reporter.report()
     mask0_binary, mask1_binary = (

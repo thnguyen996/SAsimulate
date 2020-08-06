@@ -40,13 +40,13 @@ def calculate_weight_range(state_dict):
             weights = torch.cat((weights, flatten), dim=0)
             total += flatten.numel()
         # weights = torch.cat((weights, flatten))
-    torch.save(
-        weights.cpu(), "whole_weights_cpu.pt",
-    )
+    # torch.save(
+    #     weights.cpu(), "whole_weights_cpu.pt",
+    # )
     return torch.max(weights), torch.min(weights), total
 
 if __name__ == "__main__":
-    # Comment out these 2 line to calculate weight_max, weight_min and totol number of weight
+    # Comment out these 2 line to calculate weight_max, weight_min and total number of weight
     # state_dict = torch.load("./checkpoint/resnet.pt")['net']
     # weight_max, weight_min, total = calculate_weight_range(state_dict)
     weights = torch.load("./whole_weights_cpu.pt")
