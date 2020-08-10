@@ -27,7 +27,9 @@ import SAsimulate3
 import weight_mapping as wmp
 from binary_converter import bit2float, float2bit
 from models import *
-from pyinstrument import Profiler
+
+# from pyinstrument import Profiler
+from line_profiler import *
 from pytorch_memlab import MemReporter, profile_every
 from utils import progress_bar
 
@@ -38,6 +40,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 # Tensorboard run id
 now = datetime.now().date()
 ran = random.randint(1, 231242)
+
 
 def test(net, testloader, device, criterion):
     net.eval()
@@ -67,6 +70,7 @@ def test(net, testloader, device, criterion):
     # Save best accuracy.
     acc = 100.0 * correct / total
     return acc
+
 
 def main():
 
@@ -114,7 +118,11 @@ def main():
 
     device = torch.device("cuda")
 
-    writer = SummaryWriter("runs/{}-{}".format(now, "cifar10-method1 (100 points) 1e-10 --> 1e-05 (10) -- code fix"))
+    writer = SummaryWriter(
+        "runs/{}-{}".format(
+            now, "cifar10-method1 (100 points) 1e-10 --> 1e-05 (10) -- code fix"
+        )
+    )
 
     # Create model
     model = ResNet18().to(device)
@@ -182,6 +190,7 @@ class SAsimulate:
                 self.writer.add_scalar("Average Error", avr_error, count)
                 self.writer.close()
 
+
 # Inject error without doing anything to the weight
 def method0(model, error_total):
     total_param = 0
@@ -200,23 +209,24 @@ def method0(model, error_total):
             param.data = output.view(shape)
     return model
 
+
 # XOR address mapping weight to reduce stuck at fault bits
 def method1(model, mapped_float, error_total):
     total_param = 1173962
     with torch.no_grad():
-        for name, param in model.named_parameters() :
+        for name, param in model.named_parameters():
             if "bias" in name:
                 continue
             else:
-                # TODO: Skip running mean and var and num_batches_tracked layer
                 error_layer = (param.numel() / total_param) * error_total
                 # print("Loading: " + str(name))
                 # if name == "layer4.0.conv1.weight":
                 mapped_binary_dict = torch.load(
-                    "./save_weights/"+ str(name) + "_binary.pt",
+                    "./save_binary/" + str(name) + "_binary.pt",
                     map_location=torch.device("cuda"),
                 )
                 mapped_binary_val = mapped_binary_dict[name]
+                mapped_binary_val = mapped_binary_val.type(torch.int8)
                 output = weight_map2(
                     param.data, mapped_float[name], mapped_binary_val, error_layer
                 )
@@ -229,7 +239,7 @@ def method1(model, mapped_float, error_total):
 ## Output: new weight with less error
 
 # @profile_every(1)
-
+# @profile
 def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     shape = weights.shape
     weights_flat = weights.view(-1)
@@ -246,61 +256,55 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
         mask0_binary.view(int(mask0_binary.numel() / 32 / 16), 16, 32),
         mask1_binary.view(int(mask1_binary.numel() / 32 / 16), 16, 32),
     )
-    new_weight_binary = torch.empty([*mapped_binary.shape], device = device)
+    new_weight_binary = torch.empty(
+        [*mapped_binary.shape], device=device, dtype=torch.int8
+    )
     for i in range(16):
         new_weight_binary[:, :, i, :] = SAsimulate3.make_SA(
             mapped_binary[:, :, i, :], mask0_binary, mask1_binary
         )
-    del mask0_binary
-    del mask1_binary
-    del mapped_binary
-    torch.cuda.empty_cache()
-
-    # new_weight = bit2float(
-    #     new_weight_binary, num_e_bits=8, num_m_bits=23, bias=127.0
-    # )
-    new_weight = new_map_gen(new_weight_binary)
-
-    # mapped_binary = mapped_binary.to(device)
+    half_shape = int(new_weight_binary.shape[0] / 2)
+    new_weight = torch.empty(half_shape * 2, 16, 16, device=device)
+    new_weight[0:half_shape, ...] = bit2float(
+        new_weight_binary[0:half_shape, ...], num_e_bits=8, num_m_bits=23, bias=127.0
+    )
+    new_weight[half_shape : new_weight.shape[0], ...] = bit2float(
+        new_weight_binary[half_shape : new_weight.shape[0], ...],
+        num_e_bits=8,
+        num_m_bits=23,
+        bias=127.0,
+    )
+    # new_weight = new_map_gen(new_weight_binary)
     binary_index = 0
     weight_index = 0
 
     index = torch.arange(16).to("cuda")
     index_map = wmp.mapallweights(index)
-    for weight_cases, new_weight_16 in zip(mapped_float[:, ...], new_weight):
+    dev_map = abs(mapped_float - new_weight)
+    for weight_cases, new_weight_16, dev in zip(
+        mapped_float[:, ...], new_weight[:, ...], dev_map[:, ...]
+    ):
         if weight_cases.numel() < 16:
             break
         else:
             origin_weight = weights_flat[weight_index : weight_index + 16]
             # dev = torch.empty(16, 16)
-            dev = abs(weight_cases - new_weight_16)
-            # for i in range(16):
-            #     # weight remap
-            #     weight_remap = torch.index_select(
-            #         new_weight_16[i, ...], 0, index_map[0]["w" + str(i)]
-            #     )
-                # dev[i, ...] = abs(origin_weight - weight_remap)
             dev_sum = torch.sum(dev, dim=0)
             min_dev, best_map = torch.min(dev_sum, dim=0)
             _, indicies = torch.sort(index_map[0]["w" + str(best_map.item())])
             weight_remap2 = torch.index_select(
-                new_weight_16[best_map.item(), ...],
-                0,
-                indicies,
+                new_weight_16[best_map.item(), ...], 0, indicies,
             )
             weights_flat[weight_index : weight_index + 16] = weight_remap2
             binary_index = binary_index + 512
             weight_index = weight_index + 16
     new_weights = weights_flat.view(shape)
-    del new_weight
-    del new_weight_binary
-    del weights
-    torch.cuda.empty_cache()
     return new_weights
 
 def new_map_gen(binary_map):
     for i in range(binary_map.shape[0]):
         yield bit2float(binary_map[i, ...], 8, 23, 127.0)
+
 
 ######## Load mapped weights from file and return a generator of weights for each layer
 

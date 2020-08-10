@@ -153,3 +153,13 @@ def integer2bit(integer, num_bits=8):
   exponent_bits = exponent_bits.repeat(integer.shape + (1,))
   out = integer.unsqueeze(-1) / 2 ** exponent_bits
   return (out - (out % 1)) % 2
+
+if __name__ == "__main__":
+    torch.set_printoptions(profile='full')
+    x = torch.tensor([-0.1221234e-05])
+    print('{:.10f}'.format(x.item()))
+    b = float2bit(x, 8, 23, 127.)
+    y = b.type(torch.int8).to("cuda")
+    z = bit2float(y, 8, 23, 127.)
+    print('{:.10f}'.format(z.item()))
+
