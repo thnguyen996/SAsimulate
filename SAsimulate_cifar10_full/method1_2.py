@@ -2,7 +2,10 @@ import argparse
 import collections
 import cProfile
 import os
-import pdb
+# Specify gpu
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import random
 import shutil
 import sys
@@ -10,6 +13,7 @@ import time
 import warnings
 from datetime import datetime
 from pprint import pprint
+import ipdb as pdb
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,9 +37,6 @@ from line_profiler import *
 from pytorch_memlab import MemReporter, profile_every
 from utils import progress_bar
 
-# Specify gpu
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # Tensorboard run id
 now = datetime.now().date()
@@ -120,10 +121,9 @@ def main():
 
     writer = SummaryWriter(
         "runs/{}-{}".format(
-            now, "cifar10-method1 (100 points) 1e-10 --> 1e-05 (10) -- code fix"
+            now, "cifar10-method1 (20 points) 1e-10 --> 1e-02 (1e-09) "
         )
     )
-
     # Create model
     model = ResNet18().to(device)
     # Load model state dict
@@ -136,9 +136,9 @@ def main():
         mapped_float=mapped_float,
         writer=writer,
     )
-    error_range = np.linspace(1e-10, 1e-05, 10)
+    # error_range = np.linspace(1e-05, 1e-01, 10)
+    error_range = np.arange(1e-10, 1e-02, 1e-09)
     simulate.run(error_range)
-
 
 class SAsimulate:
     def __init__(self, test_loader, model, state_dict, method, mapped_float, writer):
@@ -179,7 +179,7 @@ class SAsimulate:
                 running_error = []
                 count += 1
                 print("Error rate: ", error_total)
-                for i in range(100):
+                for i in range(20):
                     model = method1(orig_model, self.mapped_float, error_total)
                     acc1 = test(model, self.test_loader, self.device, self.criterion)
                     running_error.append(100.0 - acc1)
@@ -212,7 +212,10 @@ def method0(model, error_total):
 
 # XOR address mapping weight to reduce stuck at fault bits
 def method1(model, mapped_float, error_total):
-    total_param = 1173962
+    total_param = 11169152
+    index = torch.arange(16).to("cuda")
+    index_map = wmp.mapallweights2(index).squeeze()
+    _, indicies = torch.sort(index_map, dim=0)
     with torch.no_grad():
         for name, param in model.named_parameters():
             if "bias" in name:
@@ -228,11 +231,10 @@ def method1(model, mapped_float, error_total):
                 mapped_binary_val = mapped_binary_dict[name]
                 mapped_binary_val = mapped_binary_val.type(torch.int8)
                 output = weight_map2(
-                    param.data, mapped_float[name], mapped_binary_val, error_layer
+                    param.data, mapped_float[name], mapped_binary_val, error_layer, indicies.to("cuda")
                 )
                 param.data = output
     return model
-
 
 ## Create mask --> Find minimum mapping --> Inject error --> Remap
 ## Input: weights in 1 layer, error rate of layer
@@ -240,7 +242,7 @@ def method1(model, mapped_float, error_total):
 
 # @profile_every(1)
 # @profile
-def weight_map2(weights, mapped_float, mapped_binary, error_rate):
+def weight_map2(weights, mapped_float, mapped_binary, error_rate, indicies):
     shape = weights.shape
     weights_flat = weights.view(-1)
     device = torch.device("cuda")
@@ -278,27 +280,28 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate):
     binary_index = 0
     weight_index = 0
 
-    index = torch.arange(16).to("cuda")
-    index_map = wmp.mapallweights(index)
-    dev_map = abs(mapped_float - new_weight)
-    for weight_cases, new_weight_16, dev in zip(
-        mapped_float[:, ...], new_weight[:, ...], dev_map[:, ...]
-    ):
-        if weight_cases.numel() < 16:
-            break
-        else:
-            origin_weight = weights_flat[weight_index : weight_index + 16]
-            # dev = torch.empty(16, 16)
-            dev_sum = torch.sum(dev, dim=0)
-            min_dev, best_map = torch.min(dev_sum, dim=0)
-            _, indicies = torch.sort(index_map[0]["w" + str(best_map.item())])
-            weight_remap2 = torch.index_select(
-                new_weight_16[best_map.item(), ...], 0, indicies,
-            )
-            weights_flat[weight_index : weight_index + 16] = weight_remap2
-            binary_index = binary_index + 512
-            weight_index = weight_index + 16
-    new_weights = weights_flat.view(shape)
+    dev_map = abs(mapped_float - new_weight) # Calculate deviation
+    dev_sum_map = torch.sum(dev_map, dim=1)
+    min_dev, best_map = torch.min(dev_sum_map, dim=1) # calculate best mapping
+    best_map3d = best_map.unsqueeze(1).repeat(1, 16).unsqueeze(1)
+    best_map_16 = torch.gather(new_weight, dim=1, index=best_map3d).squeeze(1) 
+    idx_map = torch.index_select(indicies, dim=0, index=best_map)
+    weight_remap = torch.gather(best_map_16, dim=1, index=idx_map)
+    new_weights = weight_remap.view(shape)
+    # for weight_cases, new_weight_16, best_map_16 in zip(
+    #     mapped_float[:, ...], new_weight[:, ...], best_map
+    # ):
+    #     if weight_cases.numel() < 16:
+    #         break
+    #     else:
+    #         origin_weight = weights_flat[weight_index : weight_index + 16]
+    #         weight_remap2 = torch.index_select(
+    #                 new_weight_16[best_map_16.item(), ...], 0, indicies[best_map_16.item(), :],
+    #         )
+    #         weights_flat[weight_index : weight_index + 16] = weight_remap2
+    #         binary_index = binary_index + 512
+    #         weight_index = weight_index + 16
+    # new_weights = weights_flat.view(shape)
     return new_weights
 
 def new_map_gen(binary_map):

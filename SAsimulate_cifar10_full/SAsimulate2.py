@@ -77,31 +77,6 @@ def calculate_stuck(conv_binary, mask, mask1):
     stuck_total = stuck0 + stuck1
     return stuck_total
 
-##Calculate total numbers of error bits,
-## input: Flatten binary weights and mask
-## Output: Number of stuck bits 
-
-#def calculate_stuck(conv_binary, mask, mask1):
-#    stuck0 = torch.sum(mask*conv_binary)
-#    stuck1 = torch.sum(mask1) - torch.sum(mask1*conv_binary)
-#    stuck_total = stuck0 + stuck1
-#    return stuck_total
-
-## Create 2 mask: Stuck at 0 and stuck at 1
-# def create_mask(conv_binary, error_rate):
-#     shape = conv_binary.shape
-#     mask = torch.zeros(conv_binary.shape)
-#     mask1 = torch.zeros(conv_binary.shape)
-#     num_SA = (error_rate * conv_binary.numel())/2.
-#     index = torch.randperm(mask.numel())
-#     mask= mask.view(-1)                 # mask flatten
-#     mask1= mask1.view(-1)
-#     num_SA0 = index[:int(num_SA)]
-#     num_SA1 = index[(index.numel()-int(num_SA)):]
-#     mask[num_SA0] = 1.
-#     mask1[num_SA1] = 1.
-#     return mask, mask1
-
 def create_mask(conv_binary, error_rate):
     shape = conv_binary.shape
     mask = torch.zeros(conv_binary.shape)
@@ -117,18 +92,6 @@ def create_mask(conv_binary, error_rate):
     mask[num_SA0] = 1.
     mask1[num_SA1] = 1.
     return mask, mask1
-
-# profiler = Profiler()
-# weights = torch.randn(1024, 64, 3, 3)
-# conv_binary = float2bit(weights, num_e_bits=8, num_m_bits=23, bias=127.)
-# profiler.start()
-# create_mask(conv_binary, error_rate = 0.0001)
-# profiler.stop()
-# print(profiler.output_text(unicode=True, color=True))
-# x = torch.randn(32, 1, 3, 3)
-
-# output, stuck_total = make_SA(x, 0.00001)
-# print(stuck_total)
 
 
 

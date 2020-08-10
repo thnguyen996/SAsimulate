@@ -2,6 +2,9 @@ import argparse
 import collections
 import cProfile
 import os
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+
 import pdb
 import random
 import shutil
@@ -27,8 +30,6 @@ from binary_converter import bit2float, float2bit
 from models import *
 from utils import progress_bar
 
-os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 now = datetime.now().date()
 ran = random.randint(1, 231242)
@@ -55,9 +56,6 @@ def test(net, testloader, device, criterion):
 
 def main():
    
-    # print('Loading mapped weights:')
-    # mapped_gen = load_mapped_weights()
-    # print("Weights loaded")
 
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -91,9 +89,9 @@ def main():
     #Load model state dict
     state_dict = torch.load("./checkpoint/resnet.pt")['net']
     simulate = SAsimulate(test_loader, model, state_dict, method="method0", mapped_gen = [], writer = writer)  
-    error_range = np.linspace(1e-10, 1e-05, 10)
+    # error_range = np.linspace(1e-10, 1e-02, 200)
+    error_range = np.arange(1e-10, 1e-02, 1e-09)
     simulate.run(error_range)
-
 
 class SAsimulate:
     def __init__(self, test_loader, model, state_dict, method, mapped_gen, writer):
@@ -115,14 +113,14 @@ class SAsimulate:
       orig_weights_list = []
 
       orig_model = self.model
-      total_param = 11173962
+      total_param = 11169152
       if self.method == "method0":
           for error_total in error_range:
               running_error = []
               running_deviation = []
               count += 1
               print("Error rate: ", error_total)
-              for i in range(100):
+              for i in range(20):
                   model = method0(orig_model, total_param, error_total)
                   acc1 = test(model, self.test_loader, self.device, self.criterion)
                   running_error.append(100. - acc1)
@@ -138,13 +136,15 @@ def method0(model, total_param, error_total):
     device = torch.device("cuda")
     with torch.no_grad():
       for name, param in model.named_parameters():
-        shape = param.data.shape
-        error_layer = (param.numel()/total_param)*error_total
-        param_binary = float2bit(param.data, num_e_bits=8, num_m_bits=23, bias=127.)
-        mask, mask1 = SAsimulate2.create_mask(param_binary, error_layer)
-        # mask, mask1 = mask.to(device), mask1.to(device)
-        output = SAsimulate2.make_SA2(param.data.view(-1), mask, mask1)
-        param.data = output.view(shape)
+          if "bias" in name:
+              continue
+          else:
+            shape = param.data.shape
+            error_layer = (param.numel()/total_param)*error_total
+            param_binary = float2bit(param.data, num_e_bits=8, num_m_bits=23, bias=127.)
+            mask, mask1 = SAsimulate2.create_mask(param_binary, error_layer)
+            output = SAsimulate2.make_SA2(param.data.view(-1), mask, mask1)
+            param.data = output.view(shape)
     return model
 
 # import cProfile
