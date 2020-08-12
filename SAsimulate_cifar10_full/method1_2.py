@@ -40,8 +40,7 @@ from utils import progress_bar
 
 # Tensorboard run id
 now = datetime.now().date()
-ran = random.randint(1, 231242)
-
+ran = random.randint(1, 1000)
 
 def test(net, testloader, device, criterion):
     net.eval()
@@ -120,10 +119,11 @@ def main():
     device = torch.device("cuda")
 
     writer = SummaryWriter(
-        "runs/{}-{}".format(
-            now, "cifar10-method1 (20 points) 1e-10 --> 1e-02 (1e-09) "
+        "runs/{}-{}-{}".format(
+            now, ran,  "cifar10-method1 (30 points) 1e-10 --> 1e-01, 100 "
         )
     )
+    print('Run ID: {}-{}'.format(now, ran))
     # Create model
     model = ResNet18().to(device)
     # Load model state dict
@@ -137,7 +137,8 @@ def main():
         writer=writer,
     )
     # error_range = np.linspace(1e-05, 1e-01, 10)
-    error_range = np.arange(1e-10, 1e-02, 1e-09)
+    # error_range = np.arange(1e-10, 1e-02, 1e-09)
+    error_range = np.logspace(-10, -1, 100)
     simulate.run(error_range)
 
 class SAsimulate:
@@ -179,7 +180,7 @@ class SAsimulate:
                 running_error = []
                 count += 1
                 print("Error rate: ", error_total)
-                for i in range(20):
+                for i in range(30):
                     model = method1(orig_model, self.mapped_float, error_total)
                     acc1 = test(model, self.test_loader, self.device, self.criterion)
                     running_error.append(100.0 - acc1)
@@ -218,12 +219,10 @@ def method1(model, mapped_float, error_total):
     _, indicies = torch.sort(index_map, dim=0)
     with torch.no_grad():
         for name, param in model.named_parameters():
-            if "bias" in name:
+            if "weight" not in name:
                 continue
             else:
                 error_layer = (param.numel() / total_param) * error_total
-                # print("Loading: " + str(name))
-                # if name == "layer4.0.conv1.weight":
                 mapped_binary_dict = torch.load(
                     "./save_binary/" + str(name) + "_binary.pt",
                     map_location=torch.device("cuda"),
@@ -288,6 +287,7 @@ def weight_map2(weights, mapped_float, mapped_binary, error_rate, indicies):
     idx_map = torch.index_select(indicies, dim=0, index=best_map)
     weight_remap = torch.gather(best_map_16, dim=1, index=idx_map)
     new_weights = weight_remap.view(shape)
+
     # for weight_cases, new_weight_16, best_map_16 in zip(
     #     mapped_float[:, ...], new_weight[:, ...], best_map
     # ):

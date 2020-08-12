@@ -82,15 +82,22 @@ def create_mask(conv_binary, error_rate):
     mask = torch.zeros(conv_binary.shape)
     mask1 = torch.zeros(conv_binary.shape)
     mask, mask1 = mask.to("cuda"), mask1.to("cuda")
-    num_SA = (error_rate * conv_binary.numel())/2.
-    index = torch.randperm(mask.numel(), device = torch.device("cuda"))
-    # index = np.random.permutation(mask.numel())
+    num_SA = (error_rate * conv_binary.numel())
     mask = mask.view(-1)                 # mask flatten
     mask1= mask1.view(-1)
-    num_SA0 = index[:int(num_SA)]
-    num_SA1 = index[(index.numel()-int(num_SA)):]
-    mask[num_SA0] = 1.
-    mask1[num_SA1] = 1.
+    if int(num_SA) != 0:
+        error_list = torch.randint(high=mask.numel(), size=(int(num_SA/2), 2), device="cuda", dtype=torch.int32)
+        SA0_idx, SA1_idx = error_list[:, 0], error_list[:, 1]
+        mask = mask.scatter_(-1, SA0_idx.type(torch.long), torch.ones(mask.shape, device="cuda"))
+        mask1 = mask1.scatter_(-1, SA1_idx.type(torch.long), torch.ones(mask1.shape, device="cuda"))
+    # index = torch.randperm(mask.numel(), device = torch.device("cuda"))
+    # # index = np.random.permutation(mask.numel())
+    # mask = mask.view(-1)                 # mask flatten
+    # mask1= mask1.view(-1)
+    # num_SA0 = index[:int(num_SA)]
+    # num_SA1 = index[(index.numel()-int(num_SA)):]
+    # mask[num_SA0] = 1.
+    # mask1[num_SA1] = 1.
     return mask, mask1
 
 

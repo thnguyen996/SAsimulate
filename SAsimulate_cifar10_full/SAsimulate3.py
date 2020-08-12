@@ -82,14 +82,14 @@ def create_mask(weight_shape, error_rate):
     shape_list = [*weight_shape, 32]
     mask = torch.zeros(shape_list, dtype=torch.int8)
     mask1 = torch.zeros(shape_list, dtype=torch.int8)
-    num_SA = (error_rate * np.prod(shape_list))/2.
-    index = torch.randperm(mask.numel(), device = torch.device("cuda"))
+    num_SA = (error_rate * np.prod(shape_list))
     mask = mask.view(-1).to("cuda")                 # mask flatten
     mask1= mask1.view(-1).to("cuda")
-    num_SA0 = index[:int(num_SA)]
-    num_SA1 = index[(index.numel()-int(num_SA)):]
-    mask[num_SA0] = 1
-    mask1[num_SA1] = 1
+    if int(num_SA) != 0:
+        error_list = torch.randint(high=mask.numel(), size=(int(num_SA/2), 2), device="cuda", dtype=torch.int32)
+        SA0_idx, SA1_idx = error_list[:, 0], error_list[:, 1]
+        mask = mask.scatter_(-1, SA0_idx.type(torch.long), torch.ones(mask.shape, device="cuda", dtype=torch.int8))
+        mask1 = mask1.scatter_(-1, SA1_idx.type(torch.long), torch.ones(mask1.shape, device="cuda", dtype=torch.int8))
     return mask, mask1
 
 
