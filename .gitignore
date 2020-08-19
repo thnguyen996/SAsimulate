@@ -3,7 +3,8 @@ resnet18_cifar10_full/data/cifar-10-python.tar.gz
 resnet18_cifar10_full/runs/*
 resnet18_cifar10_full/save_weights/*
 resnet18_cifar10_numpy/data/cifar-10-python.tar.gz
-./data/*
+resnet18_quantize/data.cifar10/cifar-10-python.tar.gz
+data/*
 ./runs/*
 *.pt
 *.tar.gz

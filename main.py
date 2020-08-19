@@ -191,11 +191,11 @@ SAsimulate = config(
     net,
     state_dict["net"],
     "ECC_method",
-    writer=True,
+    writer=False,
     mapped_float="./resnet18_cifar10_full/saved_weights.pt",
     binary_path="./resnet18_cifar10_full/save_binary/",
 )
-error_range = np.logspace(-7, -1, 30)
+error_range = np.logspace(-6, -1, 60)
 SAsimulate.run(error_range, 40, test, 0, "./checkpoint/resnet.pt")
 
 # for epoch in range(start_epoch, start_epoch+200):
