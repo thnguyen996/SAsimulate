@@ -1,0 +1,1271 @@
+conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: &id001
+    activations: SYMMETRIC
+    weights: SYMMETRIC
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: &id002
+    conv1:
+      inputs:
+        0:
+          min: -2.429065704345703
+          max: 2.7537312507629395
+          avg_min: -2.1739289733171705
+          avg_max: 2.526004351078693
+          mean: 0.0371797792116801
+          std: 0
+          b: 0
+          shape: (10, 3, 32, 32)
+          total_numel: 1536000
+      output:
+        min: 0.0
+        max: 4.224728584289551
+        avg_min: 0.0
+        avg_max: 1.9767141617924604
+        mean: 0.03075646963715553
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer1.0.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 4.224728584289551
+          avg_min: 0.0
+          avg_max: 1.9767141617924604
+          mean: 0.08854993629455567
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: 0.0
+        max: 2.580531597137451
+        avg_min: 0.0
+        avg_max: 1.659536646075201
+        mean: -0.011883489236235618
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer1.0.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 2.580531597137451
+          avg_min: 0.0
+          avg_max: 1.659536646075201
+          mean: 0.08076420950889586
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: -5.317698001861572
+        max: 5.1116228103637695
+        avg_min: -2.9044915747813964
+        avg_max: 2.5625067317156693
+        mean: -0.065705206155777
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer1.0.shortcut:
+      inputs:
+        0:
+          min: 0.0
+          max: 4.224728584289551
+          avg_min: 0.0
+          avg_max: 1.9767141617924604
+          mean: 0.08854993629455567
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: 0.0
+        max: 4.224728584289551
+        avg_min: 0.0
+        avg_max: 1.9767141617924604
+        mean: 0.08854993629455567
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer1.1.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 5.6723408699035645
+          avg_min: 0.0
+          avg_max: 3.3035826587742596
+          mean: 0.12605348324775698
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: 0.0
+        max: 2.551240921020508
+        avg_min: 0.0
+        avg_max: 1.7687212337323153
+        mean: -0.10643656015396118
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer1.1.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 2.551240921020508
+          avg_min: 0.0
+          avg_max: 1.7687212337323153
+          mean: 0.03646954619884491
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: -3.42175555229187
+        max: 2.9225590229034424
+        avg_min: -2.254104997826984
+        avg_max: 1.9467398904231352
+        mean: -0.03620441463589668
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer1.1.shortcut:
+      inputs:
+        0:
+          min: 0.0
+          max: 5.6723408699035645
+          avg_min: 0.0
+          avg_max: 3.3035826587742596
+          mean: 0.12605348324775698
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: 0.0
+        max: 5.6723408699035645
+        avg_min: 0.0
+        avg_max: 3.3035826587742596
+        mean: 0.12605348324775698
+        std: 0
+        b: 0
+        shape: (10, 64, 32, 32)
+        total_numel: 32768000
+    layer2.0.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 4.872950077056885
+          avg_min: 0.0
+          avg_max: 2.857571590948416
+          mean: 0.1531082947254181
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: 0.0
+        max: 2.1141531467437744
+        avg_min: 0.0
+        avg_max: 1.539899345674889
+        mean: -0.06458543097972871
+        std: 0
+        b: 0
+        shape: (10, 128, 16, 16)
+        total_numel: 16384000
+    layer2.0.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 2.1141531467437744
+          avg_min: 0.0
+          avg_max: 1.539899345674889
+          mean: 0.05326126825809479
+          std: 0
+          b: 0
+          shape: (10, 128, 16, 16)
+          total_numel: 16384000
+      output:
+        min: -2.5777177810668945
+        max: 3.224918842315674
+        avg_min: -1.6157563910675374
+        avg_max: 1.863715053332385
+        mean: -0.048318419635295866
+        std: 0
+        b: 0
+        shape: (10, 128, 16, 16)
+        total_numel: 16384000
+    layer2.0.shortcut.0:
+      inputs:
+        0:
+          min: 0.0
+          max: 4.872950077056885
+          avg_min: 0.0
+          avg_max: 2.857571590948416
+          mean: 0.1531082947254181
+          std: 0
+          b: 0
+          shape: (10, 64, 32, 32)
+          total_numel: 32768000
+      output:
+        min: -2.0841805934906006
+        max: 4.3578901290893555
+        avg_min: -1.1257247654058748
+        avg_max: 1.6171502720948363
+        mean: -0.04737136417627335
+        std: 0
+        b: 0
+        shape: (10, 128, 16, 16)
+        total_numel: 16384000
+    layer2.1.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 5.147226333618164
+          avg_min: 0.0
+          avg_max: 2.6986034853937375
+          mean: 0.09848262691497803
+          std: 0
+          b: 0
+          shape: (10, 128, 16, 16)
+          total_numel: 16384000
+      output:
+        min: 0.0
+        max: 1.8247355222702026
+        avg_min: 0.0
+        avg_max: 1.1685483460326398
+        mean: -0.13568771314620973
+        std: 0
+        b: 0
+        shape: (10, 128, 16, 16)
+        total_numel: 16384000
+    layer2.1.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 1.8247355222702026
+          avg_min: 0.0
+          avg_max: 1.1685483460326398
+          mean: 0.022659493833780287
+          std: 0
+          b: 0
+          shape: (10, 128, 16, 16)
+          total_numel: 16384000
+      output:
+        min: -2.319977283477783
+        max: 3.2218778133392334
+        avg_min: -1.4822538509025454
+        avg_max: 1.6009412753491792
+        mean: -0.076710178732872
+        std: 0
+        b: 0
+        shape: (10, 128, 16, 16)
+        total_numel: 16384000
+    layer2.1.shortcut:
+      inputs:
+        0:
+          min: 0.0
+          max: 5.147226333618164
+          avg_min: 0.0
+          avg_max: 2.6986034853937375
+          mean: 0.09848262691497803
+          std: 0
+          b: 0
+          shape: (10, 128, 16, 16)
+          total_numel: 16384000
+      output:
+        min: 0.0
+        max: 5.147226333618164
+        avg_min: 0.0
+        avg_max: 2.6986034853937375
+        mean: 0.09848262691497803
+        std: 0
+        b: 0
+        shape: (10, 128, 16, 16)
+        total_numel: 16384000
+    layer3.0.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 5.293242454528809
+          avg_min: 0.0
+          avg_max: 2.708322569559311
+          mean: 0.10450626754760742
+          std: 0
+          b: 0
+          shape: (10, 128, 16, 16)
+          total_numel: 16384000
+      output:
+        min: 0.0
+        max: 2.62130069732666
+        avg_min: 0.0
+        avg_max: 1.2937826286434142
+        mean: -0.10626939010620118
+        std: 0
+        b: 0
+        shape: (10, 256, 8, 8)
+        total_numel: 8192000
+    layer3.0.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 2.62130069732666
+          avg_min: 0.0
+          avg_max: 1.2937826286434142
+          mean: 0.03962248885631562
+          std: 0
+          b: 0
+          shape: (10, 256, 8, 8)
+          total_numel: 8192000
+      output:
+        min: -1.7805352210998535
+        max: 3.724452495574951
+        avg_min: -1.3117452709323931
+        avg_max: 1.4260937643228861
+        mean: -0.10691964519023896
+        std: 0
+        b: 0
+        shape: (10, 256, 8, 8)
+        total_numel: 8192000
+    layer3.0.shortcut.0:
+      inputs:
+        0:
+          min: 0.0
+          max: 5.293242454528809
+          avg_min: 0.0
+          avg_max: 2.708322569559311
+          mean: 0.10450626754760742
+          std: 0
+          b: 0
+          shape: (10, 128, 16, 16)
+          total_numel: 16384000
+      output:
+        min: -1.2707027196884155
+        max: 2.460393190383911
+        avg_min: -0.7485007901255922
+        avg_max: 0.9738471243415768
+        mean: -0.09811109793186187
+        std: 0
+        b: 0
+        shape: (10, 256, 8, 8)
+        total_numel: 8192000
+    layer3.1.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 3.7727620601654053
+          avg_min: 0.0
+          avg_max: 1.6352258820803405
+          mean: 0.0453073667883873
+          std: 0
+          b: 0
+          shape: (10, 256, 8, 8)
+          total_numel: 8192000
+      output:
+        min: 0.0
+        max: 1.8725701570510864
+        avg_min: 0.0
+        avg_max: 0.9740468526006856
+        mean: -0.17672340798377997
+        std: 0
+        b: 0
+        shape: (10, 256, 8, 8)
+        total_numel: 8192000
+    layer3.1.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 1.8725701570510864
+          avg_min: 0.0
+          avg_max: 0.9740468526006856
+          mean: 0.0159139504134655
+          std: 0
+          b: 0
+          shape: (10, 256, 8, 8)
+          total_numel: 8192000
+      output:
+        min: -2.2356815338134766
+        max: 3.654290199279785
+        avg_min: -1.2427748489951007
+        avg_max: 1.307735648903707
+        mean: -0.11152616775035858
+        std: 0
+        b: 0
+        shape: (10, 256, 8, 8)
+        total_numel: 8192000
+    layer3.1.shortcut:
+      inputs:
+        0:
+          min: 0.0
+          max: 3.7727620601654053
+          avg_min: 0.0
+          avg_max: 1.6352258820803405
+          mean: 0.0453073667883873
+          std: 0
+          b: 0
+          shape: (10, 256, 8, 8)
+          total_numel: 8192000
+      output:
+        min: 0.0
+        max: 3.7727620601654053
+        avg_min: 0.0
+        avg_max: 1.6352258820803405
+        mean: 0.0453073667883873
+        std: 0
+        b: 0
+        shape: (10, 256, 8, 8)
+        total_numel: 8192000
+    layer4.0.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 4.447783946990967
+          avg_min: 0.0
+          avg_max: 2.154670884074989
+          mean: 0.04727257043123245
+          std: 0
+          b: 0
+          shape: (10, 256, 8, 8)
+          total_numel: 8192000
+      output:
+        min: 0.0
+        max: 2.5875957012176514
+        avg_min: 0.0
+        avg_max: 0.9853249161415379
+        mean: -0.07433052146434783
+        std: 0
+        b: 0
+        shape: (10, 512, 4, 4)
+        total_numel: 4096000
+    layer4.0.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 2.5875957012176514
+          avg_min: 0.0
+          avg_max: 0.9853249161415379
+          mean: 0.023892835348844527
+          std: 0
+          b: 0
+          shape: (10, 512, 4, 4)
+          total_numel: 4096000
+      output:
+        min: -1.7323909997940063
+        max: 3.0710020065307617
+        avg_min: -0.9260416441049664
+        avg_max: 1.3268905955316852
+        mean: -0.07138068878650668
+        std: 0
+        b: 0
+        shape: (10, 512, 4, 4)
+        total_numel: 4096000
+    layer4.0.shortcut.0:
+      inputs:
+        0:
+          min: 0.0
+          max: 4.447783946990967
+          avg_min: 0.0
+          avg_max: 2.154670884074989
+          mean: 0.04727257043123245
+          std: 0
+          b: 0
+          shape: (10, 256, 8, 8)
+          total_numel: 8192000
+      output:
+        min: -1.0142838954925537
+        max: 1.965240240097046
+        avg_min: -0.45782931208983446
+        avg_max: 0.5423791714284439
+        mean: -0.07344120144844056
+        std: 0
+        b: 0
+        shape: (10, 512, 4, 4)
+        total_numel: 4096000
+    layer4.1.conv1:
+      inputs:
+        0:
+          min: 0.0
+          max: 3.588867664337158
+          avg_min: 0.0
+          avg_max: 1.3754924856902897
+          mean: 0.02253828927874565
+          std: 0
+          b: 0
+          shape: (10, 512, 4, 4)
+          total_numel: 4096000
+      output:
+        min: 0.0
+        max: 2.193692684173584
+        avg_min: 0.0
+        avg_max: 0.8959120578885734
+        mean: -0.06490555953979489
+        std: 0
+        b: 0
+        shape: (10, 512, 4, 4)
+        total_numel: 4096000
+    layer4.1.conv2:
+      inputs:
+        0:
+          min: 0.0
+          max: 2.193692684173584
+          avg_min: 0.0
+          avg_max: 0.8959120578885734
+          mean: 0.016089052259922024
+          std: 0
+          b: 0
+          shape: (10, 512, 4, 4)
+          total_numel: 4096000
+      output:
+        min: -1.2941616773605347
+        max: 4.244693756103516
+        avg_min: -0.7070053690145767
+        avg_max: 1.5870748805909713
+        mean: 0.05527559620141983
+        std: 0
+        b: 0
+        shape: (10, 512, 4, 4)
+        total_numel: 4096000
+    layer4.1.shortcut:
+      inputs:
+        0:
+          min: 0.0
+          max: 3.588867664337158
+          avg_min: 0.0
+          avg_max: 1.3754924856902897
+          mean: 0.02253828927874565
+          std: 0
+          b: 0
+          shape: (10, 512, 4, 4)
+          total_numel: 4096000
+      output:
+        min: 0.0
+        max: 3.588867664337158
+        avg_min: 0.0
+        avg_max: 1.3754924856902897
+        mean: 0.02253828927874565
+        std: 0
+        b: 0
+        shape: (10, 512, 4, 4)
+        total_numel: 4096000
+    linear:
+      inputs:
+        0:
+          min: 0.0
+          max: 3.1538760662078857
+          avg_min: 4.267103363282863e-08
+          avg_max: 1.3236416399707258
+          mean: 0.1353887882232666
+          std: 0
+          b: 0
+          shape: (10, 512)
+          total_numel: 256000
+      output:
+        min: -3.918227434158325
+        max: 18.415910720825195
+        avg_min: -2.7489943296677755
+        avg_max: 10.411590620665898
+        mean: -2.7058506011962892e-05
+        std: 0
+        b: 0
+        shape: (10, 10)
+        total_numel: 5000
+  overrides: &id003 {}
+bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.0.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.0.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.0.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.0.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.0.shortcut:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.1.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.1.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.1.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.1.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer1.1.shortcut:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.0.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.0.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.0.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.0.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.0.shortcut.0:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.0.shortcut.1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.1.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.1.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.1.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.1.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer2.1.shortcut:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.0.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.0.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.0.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.0.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.0.shortcut.0:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.0.shortcut.1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.1.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.1.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.1.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.1.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer3.1.shortcut:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.0.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.0.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.0.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.0.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.0.shortcut.0:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.0.shortcut.1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.1.conv1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.1.bn1:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.1.conv2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.1.bn2:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+layer4.1.shortcut:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+linear:
+  bits_activations: 8
+  bits_weights: null
+  bits_bias: null
+  mode: *id001
+  clip_acts: NONE
+  clip_n_stds: null
+  clip_half_range: false
+  per_channel_wts: false
+  scale_approx_mult_bits: null
+  inputs_quant_auto_fallback: true
+  fpq_module: null
+  model_activation_stats: *id002
+  overrides: *id003
+linear_quant_params:
+  conv1.output_scale: 30.179452896118164
+  conv1.output_zero_point: 0.0
+  layer1.0.conv1.output_scale: 49.408424377441406
+  layer1.0.conv1.output_zero_point: 0.0
+  layer1.0.conv2.output_scale: 23.976539611816406
+  layer1.0.conv2.output_zero_point: 0.0
+  layer1.0.shortcut.output_scale: 30.179452896118164
+  layer1.0.shortcut.output_zero_point: 0.0
+  layer1.1.conv1.output_scale: 49.975677490234375
+  layer1.1.conv1.output_zero_point: 0.0
+  layer1.1.conv2.output_scale: 37.26157760620117
+  layer1.1.conv2.output_zero_point: 0.0
+  layer1.1.shortcut.output_scale: 22.477493286132812
+  layer1.1.shortcut.output_zero_point: 0.0
+  layer2.0.conv1.output_scale: 60.307838439941406
+  layer2.0.conv1.output_zero_point: 0.0
+  layer2.0.conv2.output_scale: 39.5358772277832
+  layer2.0.conv2.output_zero_point: 0.0
+  layer2.0.shortcut.0.output_scale: 29.25727653503418
+  layer2.0.shortcut.0.output_zero_point: 0.0
+  layer2.1.conv1.output_scale: 69.8731460571289
+  layer2.1.conv1.output_zero_point: 0.0
+  layer2.1.conv2.output_scale: 39.57319641113281
+  layer2.1.conv2.output_zero_point: 0.0
+  layer2.1.shortcut.output_scale: 24.77062225341797
+  layer2.1.shortcut.output_zero_point: 0.0
+  layer3.0.conv1.output_scale: 48.63997268676758
+  layer3.0.conv1.output_zero_point: 0.0
+  layer3.0.conv2.output_scale: 34.233219146728516
+  layer3.0.conv2.output_zero_point: 0.0
+  layer3.0.shortcut.0.output_scale: 51.82098388671875
+  layer3.0.shortcut.0.output_zero_point: 0.0
+  layer3.1.conv1.output_scale: 68.0882339477539
+  layer3.1.conv1.output_zero_point: 0.0
+  layer3.1.conv2.output_scale: 34.89049530029297
+  layer3.1.conv2.output_zero_point: 0.0
+  layer3.1.shortcut.output_scale: 33.79486846923828
+  layer3.1.shortcut.output_zero_point: 0.0
+  layer4.0.conv1.output_scale: 49.27354049682617
+  layer4.0.conv1.output_zero_point: 0.0
+  layer4.0.conv2.output_scale: 41.517391204833984
+  layer4.0.conv2.output_zero_point: 0.0
+  layer4.0.shortcut.0.output_scale: 64.8775634765625
+  layer4.0.shortcut.0.output_zero_point: 0.0
+  layer4.1.conv1.output_scale: 58.121177673339844
+  layer4.1.conv1.output_zero_point: 0.0
+  layer4.1.conv2.output_scale: 30.03750228881836
+  layer4.1.conv2.output_zero_point: 0.0
+  layer4.1.shortcut.output_scale: 35.52652359008789
+  layer4.1.shortcut.output_zero_point: 0.0
+  linear.output_scale: 6.923360824584961
+  linear.output_zero_point: 0.0

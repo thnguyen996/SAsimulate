@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: Stuck-at-faults-in-neural-network-simulation
+Version: 0.0.1
+Summary: blablablabla
+Home-page: UNKNOWN
+Author: Nguyen Thai Hoang
+Author-email: th.nguyen@skku.edu
+License: UNKNOWN
+Description: # SAsimulate
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

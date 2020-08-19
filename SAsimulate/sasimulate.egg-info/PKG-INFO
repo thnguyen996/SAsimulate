@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: sasimulate
+Version: 0+untagged.26.g4c1cd65.dirty
+Summary: Simulate stuck-at-faults neural network 
+Home-page: https://github.com/thnguyen996/sasimulate
+Author: Nguyen Thai Hoang
+Author-email: hoangchuyenli@gmail.com
+License: MIT
+Description: UNKNOWN
+Keywords: sasimulate
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
